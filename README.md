@@ -1,7 +1,7 @@
 # MinecraftClone
 'Pure' C++/OpenGL Minecraft clone, i.e. made without the use of a game engine. Uses multithreading to compute terrain data and chunk geometry on multiple hardware threads, concurrently with the rendering thread. Chunks are computed in multiple stages (generating, meshing, decorating, buffering) in order to keep threads from blocking on contended resources. All resource access synchronization is done by hand using the STL due to the absence of any thread safety in OpenGL.
 
-![Demo](videos/minecraft-clone-demo-compressed.mp4)
+https://github.com/user-attachments/assets/30baa69f-1706-437e-92ff-2019eaf0f798
 
 ## Usage
 
