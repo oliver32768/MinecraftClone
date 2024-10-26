@@ -1654,7 +1654,6 @@ void meshingThread
                         thisThreadIsSuspended = true;
                         ++numMeshingThreadsWaiting;
 
-                        // This used to be wrapped in an if (suspendMeshingThreads), not sure why
                         currentPass = Pass::IDLING;
 
                         if (numMeshingThreadsWaiting == NUM_MESHING_THREADS)
@@ -1669,7 +1668,6 @@ void meshingThread
                         if (currentPass == Pass::IDLING)
                         {
                             // Thread notified and pass not manually set - defaults to first pass (Generating)
-                            //std::cout << "[LOG] IDLING->GENERATING\n";
                             currentPass = Pass::GENERATING;
                         }
 
@@ -1706,9 +1704,6 @@ void meshingThread
                 {
                     std::scoped_lock lock{ needsBufferingMutex };
 
-                    // I'm not sure why, but wrapping this emplace in a std::move is slower
-                    // I don't understand how copy elision would be taking place here without invoking a data race
-                    // Surely the lock prevents store/load re-ordering about itself
                     needsBuffering.emplace(chunkMeshes);
                 }
             }
@@ -1748,7 +1743,6 @@ void meshingThread
                 if (needsGenerating.empty() && currentPass == Pass::GENERATING)
                 {
                     currentPass = Pass::DECORATING;
-                    //std::cout << "[LOG] GENERATING->DECORATING\n";
                 }
             }
         }
@@ -1781,7 +1775,6 @@ void meshingThread
                 if (needsDecorating.empty() && currentPass == Pass::DECORATING)
                 {
                     currentPass = Pass::MESHING;
-                    //std::cout << "[LOG] DECORATING->MESHING\n";
                 }
             }
         }
@@ -1814,7 +1807,6 @@ void meshingThread
                 if (needsMeshing.empty() && needsDecorating.empty() && currentPass == Pass::MESHING)
                 {
                     currentPass = Pass::IDLING;
-                    //std::cout << "[LOG] MESHING->IDLING\n";
                 }
             }
         }
@@ -1831,7 +1823,7 @@ ChunkMeshes buildMeshFromChunkData
     ChunkMeshes chunkMeshes{};
     chunkMeshes.origin = chunkOrigin;
 
-    chunkMeshes.nonWaterMesh.vertices.reserve(CHUNK_W * CHUNK_H * CHUNK_L * 6 * 4); // 6 faces per cube, 4 vertices per face FIXME: the max might be a lot lower than this
+    chunkMeshes.nonWaterMesh.vertices.reserve(CHUNK_W * CHUNK_H * CHUNK_L * 6 * 4); // 6 faces per cube, 4 vertices per face
     size_t nonWaterMeshIndex = 0;
 
     chunkMeshes.waterMesh.vertices.reserve(CHUNK_W * CHUNK_H * CHUNK_L * 6 * 4);
@@ -1887,7 +1879,6 @@ constexpr uint32_t packAttributes32(int posX, int posY, int posZ, int brightness
 
 void addBillboard(Mesh& mesh, size_t& currentMeshIndex, const glm::vec3& localChunkPos, const glm::vec3& chunkOrigin, const Block blockEnum, const uint8_t texture2DArrayDepth)
 {
-    // I could flatten this now
     static constexpr int faces[2][4][7] =
     {
         {
